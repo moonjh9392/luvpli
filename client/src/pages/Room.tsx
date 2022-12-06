@@ -298,6 +298,7 @@ const Room = () => {
 	}, []);
 
 	const onValid = () => {
+		client.activate();
 		reset();
 		send();
 	};
@@ -310,7 +311,7 @@ const Room = () => {
 		// debug: function (str) {
 		// 	console.log('디버그', str);
 		// },
-		reconnectDelay: 1000,
+		reconnectDelay: 200,
 		heartbeatIncoming: 4000,
 		heartbeatOutgoing: 4000,
 	});
@@ -319,9 +320,9 @@ const Room = () => {
 		console.log('Broker reported error: ' + frame.headers['message']);
 		console.log('Additional details: ' + frame.body);
 	};
-	if (!client.connected) {
-		client.activate();
-	}
+	// if (!client.connected) {
+	// 	client.activate();
+	// }
 
 	const wsSubscribe = () => {
 		client.subscribe(`/sub/chat/room/${roomId}`, message_callback, {
@@ -410,7 +411,7 @@ const Room = () => {
 					destination: `/pub/chat/sendMessage/${roomId}`,
 					body: JSON.stringify(messageObject),
 				}),
-			300,
+			500,
 		);
 	};
 
@@ -458,12 +459,24 @@ const Room = () => {
 	const AdminEmailList = [
 		process.env.REACT_APP_ADMIN_EMAIL_01,
 		process.env.REACT_APP_ADMIN_EMAIL_02,
+		process.env.REACT_APP_ADMIN_EMAIL_03,
 	];
 
 	const onClick = () => {
+		client.activate();
 		if (userLength !== 1) {
-			leave();
-			navigate('/');
+			Swal.fire({
+				icon: 'warning',
+				text: `정말 나가시겠습니까?`,
+				showCancelButton: true,
+				confirmButtonText: '나가기',
+				cancelButtonText: '취소',
+			}).then((res) => {
+				if (res.isConfirmed) {
+					leave();
+					navigate('/');
+				}
+			});
 		} else {
 			Swal.fire({
 				icon: 'warning',
