@@ -1,5 +1,3 @@
-# luvpli
-=======
 # 러플리 (Luvpli)
 
 ![로고](https://user-images.githubusercontent.com/74370531/205530048-516ae0ad-9cd6-4683-ab1e-104afa0682f6.png)
