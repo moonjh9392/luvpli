@@ -26,29 +26,19 @@
 
 ## ✅ 맡은 역할
 
-<details>
-<summary>FE</summary>
-<div markdown="1">
 
-- 문지훈 : 유튜브 API를 이용한 playlist CRUD 및 마이페이지 관리
+- FE
+  - 문지훈 : 유튜브 API를 이용한 playlist CRUD 및 마이페이지 관리
 
-- 송준모 : 방 CRUD, Stomp를 통한 웹 소켓 통신(실시간 채팅), 방에서 playlist 관리
+  - 송준모 : 방 CRUD, Stomp를 통한 웹 소켓 통신(실시간 채팅), 방에서 playlist 관리
 
-- 홍유진 : 소셜(Google) 로그인 및 회원정보 수정, 메인(홈, 랭킹, 검색) 기능 담당
-</div>
-</details>
+  - 홍유진 : 소셜(Google) 로그인 및 회원정보 수정, 메인(홈, 랭킹, 검색) 기능 담당
+- BE
+  - 노영석 : 회원 CRUD, 랭킹, 팔로우, 검색
 
-<details>
-<summary>BE</summary>
-<div markdown="1">
+  - 김아리 : 방 CRUD, 웹소켓 Stomp 통신 실시간 채팅 구현
 
-- 노영석 : 회원 CRUD, 랭킹, 팔로우, 검색
-
-- 김아리 : 방 CRUD, 웹소켓 Stomp 통신 실시간 채팅 구현
-
-- 정경은 : playlist CRUD
-</div>
-</details>
+  - 정경은 : playlist CRUD
 
 <br/>
 
