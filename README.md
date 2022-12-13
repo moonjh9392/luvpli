@@ -4,7 +4,7 @@
 
 ### 🔗 배포 : https://luvpli.link
 
-### 🔗 노션 : https://www.notion.so/codestates/b4ec65e1bdb246b4b3c01dd68f3f9063
+### 🔗 노션 : https://www.notion.so/b6743b64483b462795231baf9c295432?p=787a146451974abfbb7a566db423a74d&pm=c
 
 <br/>
 <hr/>
