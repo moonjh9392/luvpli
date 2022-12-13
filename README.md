@@ -159,6 +159,20 @@ Stomp는 위의 사진과 같은 구조를 하고있음
 </div>
 </details>
 
+<details>
+<summary><b>3. 유튜브 API</b></summary>
+<div markdown="1">
+	
+</div>
+</details>
+
+<details>
+<summary><b>4. 배포 자동화</b></summary>
+<div markdown="1">
+	
+</div>
+</details>
+
 <br/>
 
 ## 🚀 기술 스택
