@@ -270,7 +270,7 @@ jobs:
 
 - github에 repository에 올라가면 안되는 중요한 정보들은 로컬에서는 env를 만들어 사용하였으나 action에서는 적용되지 않기 때문에 secret key를 만들어 사용하였다.
 - 배포 순서 : github Action ⇒ AWS S3(http) ⇒ AWS CloudFront(https) ⇒ AWS Route53(도메인 변경)
-- Action => S3는 자동으로 배포되지만 CloudFront는 일정시간마다 재배포되기 때문에 push한 즉시 반영결과를 보고싶다면 CloudFront의 무효화 기능일 이용해야했다.
+- Action ⇒ S3는 자동으로 배포되지만 CloudFront는 일정시간마다 재배포되기 때문에 push한 즉시 반영결과를 보고싶다면 CloudFront의 무효화 기능을 이용해야했다.
 </div>
 </details>
 
