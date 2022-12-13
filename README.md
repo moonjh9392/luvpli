@@ -55,7 +55,7 @@
 ## 구현 핵심 기능
 
 <details>
-<summary><b>1. 로그인</b></summary>
+<summary><b>1. 로그인 </b></summary>
 <div markdown="1">
 
   ```jsx
@@ -125,8 +125,6 @@ instance.interceptors.response.use(
 </div>
 </details>
 
-<br/>
-
 <details>
 <summary><b>2. 소켓통신</b></summary>
 <div markdown="1">
@@ -160,16 +158,118 @@ Stomp는 위의 사진과 같은 구조를 하고있음
 </details>
 
 <details>
-<summary><b>3. 유튜브 API</b></summary>
+<summary><b>3. 유튜브 API를 이용한 영상 재생</b></summary>
 <div markdown="1">
-	
+
+- 영상의 url에서 videoId를 추출하여 유튜브 api에 해당 영상의 데이터 요청
+- 받아온 데이터를 DB에 저장 후 여러가지 용도로 사용함
+
+```tsx
+https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${process.env.REACT_APP_YOUTUBE_KEY}
+//위의 주소로 get 요청을 하면 해당영상의 정보를 받아올 수 있음
+//id : 예를 들면 https://www.youtube.com/watch?v=D6cEVIJNlp8 wathc?v={여기가 id}
+
+getYouTubeMusic(videoId)
+				.then((res) => {
+					if (res.items[0]?.snippet) {
+						result = true;
+						musicInfo.videoId = videoId;
+						musicInfo.url = url;
+						musicInfo.channelTitle = res.items[0].snippet.channelTitle;
+						musicInfo.title = res.items[0].snippet.title;
+						if (res.items[0].snippet.thumbnails.maxres) {
+							musicInfo.thumbnail = res.items[0].snippet.thumbnails.maxres.url;
+						} else {
+							musicInfo.thumbnail = res.items[0].snippet.thumbnails.medium.url;
+						}
+					}
+				})
+//url : 영상의 유튜브 주소
+//videoId : player를 재생시킬때 필요한 id
+//channelTitle : 채널 아이디
+//title : 영상 제목
+//thumbnail : 썸네일
+
+//데이터들을 저장하여 화면에 보여줄때나 플레이어를 재생 시킬때 사용
+```
+
+- react-youtube를 이용하여 영상 재생
+
+```tsx
+<YouTube
+								videoId={videoId}
+								opts={opts}
+								onReady={onReady}
+								onPlay={onPlay}
+							/>
+
+//videoId : 재생될 영상의 videoId
+//opts : player의 default 옵션
+//onReady : 영상이 준비되었을때 실행할 메소드
+//onPlay : 영상이 play 되었을때 실행할 메소드
+```
+
+- 화면에서는 player의 크기를 0으로 하여 보이지 않게하고 소리만 들리게 만들어 영상을 보는것이 아닌 음악감상을 하는 느낌을 주게 만들었다.
 </div>
 </details>
 
 <details>
 <summary><b>4. 배포 자동화</b></summary>
 <div markdown="1">
-	
+
+- githubAction 으로 dev branch에 push 하면 자동으로 AWS S3에 빌드/배포 되도록 만듬
+
+```yaml
+# .github/workflows/main.yml
+name: client
+on:
+  push:
+    branches:
+      - dev
+env:
+  REACT_APP_STACK_SERVER: ${{ secrets.REACT_APP_STACK_SERVER }}
+  REACT_APP_YOUTUBE_KEY: ${{ secrets.REACT_APP_YOUTUBE_KEY }}
+  REACT_APP_STACK_WS_SERVER: ${{ secrets.REACT_APP_STACK_WS_SERVER}}
+  REACT_APP_ADMIN_EMAIL_01: ${{secrets.REACT_APP_ADMIN_EMAIL_01}}
+  REACT_APP_ADMIN_EMAIL_02: ${{secrets.REACT_APP_ADMIN_EMAIL_02}}
+  REACT_APP_ADMIN_EMAIL_03: ${{secrets.REACT_APP_ADMIN_EMAIL_03}}
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout source code.
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./client
+      - name: Build
+        run: npm run build
+        env:
+          CI: ""
+        working-directory: ./client
+      - name: SHOW AWS CLI VERSION
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_EC2_METADATA_DISABLED: true
+        run: |
+          aws --version
+      - name: Sync Bucket
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_EC2_METADATA_DISABLED: true
+        run: |
+          aws s3 sync \
+            --region ap-northeast-2 \
+            build s3://luvpli \
+            --delete
+        working-directory: ./client
+```
+
+- github에 repository에 올라가면 안되는 중요한 정보들은 로컬에서는 env를 만들어 사용하였으나 action에서는 적용되지 않기 때문에 secret key를 만들어 사용하였다.
+- 배포 순서 : github Action ⇒ AWS S3(http) ⇒ AWS CloudFront(https) ⇒ AWS Route53(도메인 변경)
 </div>
 </details>
 
