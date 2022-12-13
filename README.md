@@ -52,6 +52,115 @@
 
 <br/>
 
+## 구현 핵심 기능
+
+<details>
+<summary><b>1. 로그인</b></summary>
+<div markdown="1">
+
+  ```jsx
+//액세스 토큰 : 30분 
+//리프레시 토큰 : 3일
+
+//로그인시 액세스 토큰,리프레시 토큰 param 으로 받아서 localStorage에 저장
+
+localStorage.setItem('accessToken', accessToken);
+localStorage.setItem('refreshToken', refreshToken);
+
+//헤더에 엑세스 토큰 세팅
+instance.defaults.headers.Authorization = accessToken;
+
+//만료 로직
+//액세스 토큰 만료시 => 서버에서 401 코드를 받음 리프레시 토큰을 담아 재발급 api 요청
+//재발급 요청에서 리프레시 토큰 만료 확인 => 서버에서 404 코드 받음 => 로그아웃 
+instance.interceptors.response.use(
+	(response) => {
+		return response;
+	},
+
+	async (error) => {
+		// 액세스 토큰 만료 => 새 액세스 토큰 발급(연장)
+		if (error.response.status === 401) {
+			instance
+				.post(
+					`/api/members/refresh`,
+					{},
+					{
+						headers: {
+							RefreshToken: localStorage.getItem('refreshToken'),
+						},
+					},
+				)
+				.then((res) => {
+					localStorage.setItem('accessToken', res.headers.authorization);
+
+					window.alert('로그인이 연장되었습니다. 새로고침됩니다.');
+					window.location.reload();
+				})
+				.catch((err) => {
+					// 리프레시 토큰 만료 => 로그아웃
+					if (err.response.status === 404) {
+						window.alert('로그인이 만료되었습니다. 홈으로 이동됩니다.');
+						window.location.href = '/logout';
+					}
+				});
+		}
+
+		return Promise.reject(error);
+	},
+);
+```
+
+- 쿠키에 토큰을 저장하는 방법도 생각 해봤지만 웹스토리지의 여러가지 이점으로 인해 로컬스토리지에 저장하기로 결정
+
+## Web Storage
+
+- 쿠키와 달리 자동 전송의 위험성이 없음
+- **오리진(Origin)**(도메인,프로토콜,포트) 단위로 접근이 제한되는 특성 덕분에 **CSRF로 부터 안전**
+- 쿠키보다 **큰 저쟝 용량 지원**(모바일 2.5MB, 데스크탑 5~10MB)
+- 서버가 HTTP 헤더를 통해 스토리지 객체를 조작할 수 없음(웹 스토리지 객체 조작은 JavaScript 내에서만 수행)
+- 오직 **문자형(string)** 데이터 타입만 지원
+- **로컬 스토리지(Local Storage)** 와 **세션 스토리지(Session Storage)** 가 있으며, 같은 Storage 객체를 상속하기 때문에 메서드가 동일  
+  
+</div>
+</details>
+
+<br/>
+
+<details>
+<summary><b>2. 소켓통신</b></summary>
+<div markdown="1">
+  
+  채팅을 위해 Stomp사용
+
+![image](https://user-images.githubusercontent.com/45509511/207283679-7f6944e0-f963-4ed8-b00c-a5a81b735800.png)
+
+Stomp는 위의 사진과 같은 구조를 하고있음
+
+- connect : 소켓을 연결
+- subcribe(구독) : 서버로부터 받는 응답을 처리
+- activate(활성화) : 데이터를 send 하기 위해 소켓을 활성화 activate 하면 connect도 같이됨
+- publish(send) : 데이터를 서버로 보냄
+
+문제점
+
+- activate 상태에서 event가 발생하면 connect의 연결상태가 false로 바뀌어 event가 발생할때마다 activate를 해줘야함
+- 이 증상으로 인하여 서버의 용량이 작으면(EC2 프리티어 사용함) 과부하가 걸려 페이지가 아예 먹통이 되버린다.
+  
+![image](https://user-images.githubusercontent.com/45509511/207283582-c9880a97-26fd-4416-91b9-74eec72aed52.png)
+
+해결방법
+
+- connect의 연결상태가 false여도 최초에 생성한 subcribe는 살아있어서 서버로 부터 응답을 받을수 있는것을 발견
+- event가 발생할때 마다 activate 하지않고 데이터를 보낼때만 activate하는 것으로 변경
+- 여기서 다시 <span style="color:red"> **문제** </span> 가 발생 activate ⇒ publish 하는데 activate 되는동안 publish가 먼저 전송되어 연결이 활성화 되어있지 않다는 오류가 발생
+- publish하기전에 activate가 될수있는 시간을 벌기위해 publish를 settimeout으로 감싸주어 지연시간을 생성하여 해결함
+  
+</div>
+</details>
+
+<br/>
+
 ## 🚀 기술 스택
 
 ### Cloud
