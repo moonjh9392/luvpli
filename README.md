@@ -55,7 +55,7 @@
 ## 구현 핵심 기능
 
 <details>
-<summary><b>1. 로그인 </b></summary>
+<summary><b>1. 로그인 토큰 </b></summary>
 <div markdown="1">
 
   ```jsx
@@ -126,7 +126,7 @@ instance.interceptors.response.use(
 </details>
 
 <details>
-<summary><b>2. 소켓통신</b></summary>
+<summary><b>2. 소켓통신을 </b></summary>
 <div markdown="1">
   
   채팅을 위해 Stomp사용
