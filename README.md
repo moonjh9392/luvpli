@@ -4,7 +4,7 @@
 
 ### 🔗 배포 : https://luvpli.link
 
-### 🔗 노션 : https://www.notion.so/b6743b64483b462795231baf9c295432?p=787a146451974abfbb7a566db423a74d&pm=c
+### 🔗 노션 : [https://www.notion.so/b6743b64483b462795231baf9c295432?p=787a146451974abfbb7a566db423a74d&pm=c](https://light-eyebrow-b69.notion.site/playlist-2a71599f4f3d4f059f04e7b30190bc5c?pvs=4)
 
 <br/>
 <hr/>
